@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<canvas style="width: 250px; height:250px;">
+
+</canvas>
+</body>
+<script>
+    let canvas = document.querySelector('canvas');
+    canvas.height = 500 * devicePixelRatio;
+    canvas.width = 500 * devicePixelRatio;
+    let ctx = canvas.getContext('2d');
+    ctx.fillRect(0, 0, 100, 100);
+</script>
+</html>
