@@ -6,6 +6,8 @@
 
 ![ScreenShot](./img/audio.png)
 
+[Demo](http://zincox.gitee.io/vueaudiovisible-preview/)
+
 ## 参数
 
 | 参数             | 类型    | 默认值 | 描述                                                              |

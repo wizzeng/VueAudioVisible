@@ -6,6 +6,8 @@ A USELESS Wave form Component for Vue.
 
 ![ScreenShot](./img/audio.png)
 
+[Preview](http://zincox.gitee.io/vueaudiovisible-preview/)
+
 ## Param
 
 | Param            | Type    | Default | Explain                                                     |
