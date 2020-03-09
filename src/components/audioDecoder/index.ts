@@ -1,6 +1,7 @@
 export class AudioDecoder {
     private audioCtx: AudioContext = new AudioContext();
     private audioBuffer: AudioBuffer | null = null;
+    private audioEl: HTMLAudioElement | null = null;
 
     private decodedArrayBuffer: Float32Array | null = null;
 
@@ -23,12 +24,27 @@ export class AudioDecoder {
             this.audioCtx.decodeAudioData(req.response).then(audioBuffer => {
                 this.audioBuffer = audioBuffer;
                 this.decodeAudio();
+                // TODO: 从 Buffer 生成 Audio
+                // this.createAudioElement(req.response);
                 if (this.onLoadBuffer) {
                     this.onLoadBuffer();
                 }
             }).catch(e => {
                 this.onLoadError(e);
             });
+        }
+    }
+
+    private createAudioElement(arrBuf: ArrayBuffer) {
+        let blob = new Blob([arrBuf], {type: 'audio/wave'});
+        let src = URL.createObjectURL(blob);
+        this.audioEl = new HTMLAudioElement();
+        this.audioEl.src = src;
+    }
+
+    getAudioElement() {
+        if(this.audioEl) {
+            return this.audioEl;
         }
     }
 

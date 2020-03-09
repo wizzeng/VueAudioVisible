@@ -12,10 +12,13 @@
                                 :volume="volume"
                                 :emit-progress-time="emitProgressTime"
                                 :pixel-radio="pixelRadio"
+                                @audioEnd="playStatus=false"
+                                @loadAudio="status='Load Successfully'"
+                                @loadError="handleError"
         />
         <div class="demo">
             <h1>{{toPlayTime(this.playProgress.current)}} / {{toPlayTime(this.playProgress.duration)}}</h1>
-            <h2>Status: {{playStatus}}</h2>
+<!--            <h2>Status: {{status}}</h2>-->
             <button @click="handlePlay">{{playStatus?'Pause': 'Play'}}</button>
             <demo-input v-model="volume" title="Volume"/>
             <demo-input v-model="width" title="Width"/>
@@ -42,6 +45,7 @@
     })
     export default class App extends Vue {
 
+        public status = '';
         public playStatus = false;
         public playProgress: ProgressChangePlayload = {
             progress: 0,
@@ -60,7 +64,7 @@
 
         toPlayTime(secondCount: number) {
             let minutes = Math.floor((secondCount) / 60);
-            let second = Math.floor(secondCount - minutes * 60);
+            let second = Math.round(secondCount - minutes * 60);
             return `${minutes}:${second}`
         }
 
@@ -70,6 +74,10 @@
 
         handleChange(changePlayload: ProgressChangePlayload) {
             this.playProgress = changePlayload;
+        }
+
+        handleError(e: Error){
+            this.status = 'Error Occur: ' + e;
         }
     }
 </script>

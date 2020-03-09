@@ -1,6 +1,6 @@
 <template>
     <div class="player-box" ref="playerBox">
-        <audio ref="music">
+        <audio ref="music" >
             <source src="music.mp3">
         </audio>
         <canvas ref="canvas" :style="canvasStyle"
@@ -103,7 +103,7 @@
             };
             this.decoder.onLoadBuffer = () => {
                 if (this.decoder) {
-                    this.$emit('load');
+                    this.$emit('loadSuccess');
                     this.decodedData = this.decoder.getDecodedArray(this.width, this.height);
                 }
             };
@@ -118,6 +118,7 @@
 
         mounted(): void {
             this.initCanvas();
+            this.onVolumeChange(this.volume);
             this.setCurrentProgress();
             this.setProgressEmitter();
             this.setProgress();
@@ -129,9 +130,9 @@
 
         @Prop({
             default: () => ({
-                timeline: '#e17b5e',
+                timeline: '#e1904c',
                 segment: '#5C9BE1',
-                passSegment: '#405dc1'
+                passSegment: '#c15a73'
             })
         }) drawColor!: DrawColor;
 
@@ -150,9 +151,12 @@
         }
 
         @Watch('currentProgress')
-        onProgressChange() {
+        onProgressChange(value: number) {
             this.debouncedSetProgress(this);
             this.draw();
+            if(value === 1){
+                this.$emit('audioEnd');
+            }
         }
 
         @Watch('playStatus')
@@ -261,10 +265,8 @@
         }
 
         decodeData(src: string) {
-            if (this.decodedData) {
-                this.$emit('onLoad');
-            } else {
-                this.$emit('decodeFailed');
+            if(this.decoder) {
+                this.decoder.openRemoteSource(src);
             }
         }
 
