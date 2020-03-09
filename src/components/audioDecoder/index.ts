@@ -42,7 +42,7 @@ export class AudioDecoder {
                             value = currentValue;
                         }
                     }
-                    let pixelHeight = parseInt((value * height * 0.8).toFixed());
+                    let pixelHeight = parseInt((value * height).toFixed());
                     if(pixelHeight < 5) {
                         pixelHeight += 5
                     }
