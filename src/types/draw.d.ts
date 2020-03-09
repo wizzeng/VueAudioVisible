@@ -3,3 +3,10 @@ export type DrawColor = {
     passSegment: string;
     timeline: string;
 }
+
+
+export type ProgressChangePlayload = {
+    progress: number;
+    current: number;
+    duration: number
+}

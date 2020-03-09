@@ -2,8 +2,11 @@ export class AudioDecoder {
     private audioCtx: AudioContext = new AudioContext();
     private audioBuffer: AudioBuffer | null = null;
 
+    private decodedArrayBuffer: Float32Array | null = null;
+
     public onLoadBuffer: Function | null = null;
-    public onLoadError: (error: DOMException) => void | null = () => {};
+    public onLoadError: (error: DOMException) => void | null = () => {
+    };
 
     constructor(source?: string) {
         if (source) {
@@ -19,6 +22,7 @@ export class AudioDecoder {
         req.onload = () => {
             this.audioCtx.decodeAudioData(req.response).then(audioBuffer => {
                 this.audioBuffer = audioBuffer;
+                this.decodeAudio();
                 if (this.onLoadBuffer) {
                     this.onLoadBuffer();
                 }
@@ -28,35 +32,40 @@ export class AudioDecoder {
         }
     }
 
-    getDecodedArray(width: number, height: number): number[] {
+    decodeAudio() {
         if (this.audioBuffer) {
             let result: number[] = [];
             if (this.audioBuffer) {
-                let data = this.audioBuffer.getChannelData(0);
-                let step = Math.ceil(data.length / width);
-                for (let i = 0; i < width; i++) {
-                    let value = 0;
-                    for (let j = 0; j < step; j++) {
-                        let currentValue = data[i * step + j];
-                        if (currentValue > value) {
-                            value = currentValue;
-                        }
-                    }
-                    let pixelHeight = parseInt((value * height).toFixed());
-                    if(pixelHeight < 5) {
-                        pixelHeight += 5
-                    }
-                    result.push(pixelHeight);
-                }
+                this.decodedArrayBuffer = this.audioBuffer.getChannelData(0);
             }
             return result;
         } else {
             console.error('Audio is not loaded.');
             return [];
         }
-
     }
 
+    getDecodedArray(width: number, height: number): number[] {
+        let result: number[] = [];
+        if (this.audioBuffer && this.decodedArrayBuffer) {
+            let step = Math.ceil(this.decodedArrayBuffer.length / width);
+            for (let i = 0; i < width; i++) {
+                let value = 0;
+                for (let j = 0; j < step; j++) {
+                    let currentValue = this.decodedArrayBuffer[i * step + j];
+                    if (currentValue > value) {
+                        value = currentValue;
+                    }
+                }
+                let pixelHeight = parseInt((value * height).toFixed());
+                if (pixelHeight < 5) {
+                    pixelHeight += 5
+                }
+                result.push(pixelHeight);
+            }
+        }
+        return result;
+    }
 
 }
 

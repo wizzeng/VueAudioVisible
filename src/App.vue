@@ -1,51 +1,104 @@
 <template>
     <div id="app">
-        <audio ref="music">
-            <source src="music.mp3">
-        </audio>
-        <button @click="handlePlay">play</button>
         <audio-visible-overview source="music.mp3"
-                                :width="1000"
-                                :height="200"
-                                @changeProgress="handleProgress"
-                                :play-progress="playProgress"
-                                :play-status="playStatus"/>
+                                :width="width"
+                                :height="height"
+                                :play-status="playStatus"
+                                @changeProgress="handleChange"
+                                :segment-space="segmentSpace"
+                                :segment-width="segmentWidth"
+                                :time-line-width="timeLineWidth"
+                                :height-radio="heightRadio"
+                                :volume="volume"
+                                :emit-progress-time="emitProgressTime"
+                                :pixel-radio="pixelRadio"
+        />
+        <div class="demo">
+            <h1>{{toPlayTime(this.playProgress.current)}} / {{toPlayTime(this.playProgress.duration)}}</h1>
+            <h2>Status: {{playStatus}}</h2>
+            <button @click="handlePlay">{{playStatus?'Pause': 'Play'}}</button>
+            <demo-input v-model="volume" title="Volume"/>
+            <demo-input v-model="width" title="Width"/>
+            <demo-input v-model="height" title="Height"/>
+            <demo-input v-model="segmentWidth" title="SegmentWidth"/>
+            <demo-input v-model="segmentSpace" title="SegmentSpace"/>
+            <demo-input v-model="timeLineWidth" title="TimeLineWidth"/>
+            <demo-input v-model="heightRadio" title="HeightRadio"/>
+            <demo-input v-model="emitProgressTime" title="EmitProgressTime"/>
+            <demo-input v-model="pixelRadio" title="PixelRadio"/>
+        </div>
+
     </div>
 </template>
 
 <script lang="ts">
-    import {Component, Vue} from 'vue-property-decorator';
+    import {Component, Vue, Watch} from 'vue-property-decorator';
     import AudioVisibleOverview from "@/components/audioVisible/AudioVisibleOverview.vue";
+    import {ProgressChangePlayload} from "@/types/draw";
+    import DemoInput from "@/components/DemoInput.vue";
 
     @Component({
-        components: {AudioVisibleOverview},
+        components: {DemoInput, AudioVisibleOverview},
     })
     export default class App extends Vue {
 
-        public playProgress = 0;
         public playStatus = false;
+        public playProgress: ProgressChangePlayload = {
+            progress: 0,
+            current: 0,
+            duration: 0
+        };
+        public volume = 0.4;
+        public width = 3000;
+        public height = 200;
+        public segmentSpace = 3;
+        public segmentWidth = 2;
+        public timeLineWidth = 5;
+        public heightRadio = 0.6;
+        public emitProgressTime = 1000;
+        public pixelRadio = 3;
 
-        handlePlay() {
-            let audio = this.$refs['music'] as HTMLAudioElement;
-            if (!this.playStatus) {
-                this.playStatus = true;
-                audio.play();
-            } else {
-                this.playStatus = false;
-                audio.pause();
-            }
-            setInterval(() => {
-                this.playProgress = audio.currentTime / audio.duration;
-            }, 10);
+        toPlayTime(secondCount: number) {
+            let minutes = Math.floor((secondCount) / 60);
+            let second = Math.floor(secondCount - minutes * 60);
+            return `${minutes}:${second}`
         }
 
-        handleProgress(value: number) {
-            let audio = this.$refs['music'] as HTMLAudioElement;
-            audio.currentTime = audio.duration * value;
+        handlePlay() {
+            this.playStatus = !this.playStatus;
+        }
+
+        handleChange(changePlayload: ProgressChangePlayload) {
+            this.playProgress = changePlayload;
         }
     }
 </script>
 
 <style lang="scss">
+    * {
+        margin: 0;
+        padding: 0;
+    }
 
+    .demo {
+        margin-top: 50px;
+        margin-bottom: 100px;
+        text-align: center;
+
+        button {
+            margin: 20px auto;
+            width: 100px;
+            height: 40px;
+            color: gray;
+            border: 1px solid #989898;
+            border-radius: 3px;
+            background-color: transparent;
+            transition: all .5s;
+
+            &:hover {
+                color: black;
+                border: 2px solid black;
+            }
+        }
+    }
 </style>
